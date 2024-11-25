@@ -15,4 +15,5 @@ urlpatterns = [
     path('listar_modelos/', views.listar_modelos, name='listar_modelos'),
     path('detalhes_produto/<int:produto_id>/', views.detalhes_produto, name='detalhes_produto'),
     path('preencher_form/', views.preencher_form, name='preencher_form'),
+    path('login/', views.login, name='login'),
 ]

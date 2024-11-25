@@ -11,10 +11,14 @@ from .forms import ProdutoForm
 import requests
 from django.core.files.base import ContentFile
 from urllib.parse import urlparse
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
 
 # Função para verificar se o usuário é administrador (superusuário)
 def admin_check(user):
     return user.is_superuser  # Verifica se o usuário é um superusuário (admin)
+
 
 # Lista de produtos (disponível para todos os usuários)
 def listar_produtos(request):
