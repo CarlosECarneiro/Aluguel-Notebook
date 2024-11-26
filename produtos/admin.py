@@ -5,6 +5,11 @@ from django.utils.html import format_html
 # Registre os modelos do seu app normalmente
 from .models import Produto
 
+from .models import Aluguel
+
+@admin.register(Aluguel)
+class AluguelAdmin(admin.ModelAdmin):
+    list_display = ('id', 'usuario', 'notebook', 'meses', 'data_aluguel')
 # Classe personalizada para o Admin
 class ProdutoAdmin(admin.ModelAdmin):
     list_display = ('nome', 'preco', 'estoque', 'imagem')

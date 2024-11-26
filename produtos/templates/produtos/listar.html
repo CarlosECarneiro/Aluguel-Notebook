@@ -11,7 +11,7 @@
     
     {% if user.is_authenticated %}
         <p>Bem-vindo, {{ user.username }}!</p>
-        
+        <a href="{% url 'produtos:listar_alugueis' %}">Meus Alugueis</a>
         <form action="{% url 'logout' %}" method="POST">
             {% csrf_token %}
             <button type="submit">Sair</button>
@@ -29,6 +29,8 @@
     
     {% if user.is_authenticated and user.is_superuser %}
         <a href="{% url 'produtos:adicionar_produto' %}">Adicionar Novo Produto</a>
+        
+        <a href="{% url 'produtos:adm_alugueis' %}">Administrar Alugueis</a>
     {% endif %}
     
     <ul>

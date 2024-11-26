@@ -6,21 +6,34 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
-from .models import Produto
 from .forms import AlugarProdutoForm, ProdutoForm
 import requests
 from django.core.files.base import ContentFile
 from urllib.parse import urlparse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
 from django.http import HttpResponseForbidden
+from .models import Produto, Aluguel
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 # Função para verificar se o usuário é administrador (superusuário)
 def admin_check(user):
     return user.is_superuser  # Verifica se o usuário é um superusuário (admin)
 
+@login_required(login_url='/cadastro/')  # Redireciona para login se não autenticado
+def listar_alugueis(request):
+    # Filtra os aluguéis do usuário autenticado
+    alugueis = Aluguel.objects.filter(usuario=request.user)
+    return render(request, 'produtos/listar_alugueis.html', {'alugueis': alugueis})
+@staff_member_required(login_url='')  # Permite acesso apenas a administradores
+def adm_alugueis(request):
+    alugueis = Aluguel.objects.all()  # Busca todos os registros de aluguel
+    return render(request, 'produtos/adm_alugueis.html', {'alugueis': alugueis})
+
+@staff_member_required(login_url='')
+def deletar_aluguel(request, aluguel_id):
+    aluguel = get_object_or_404(Aluguel, id=aluguel_id)
+    aluguel.delete()
+    return redirect('produtos:adm_alugueis')
 
 # Lista de produtos (disponível para todos os usuários)
 def listar_produtos(request):
@@ -232,15 +245,24 @@ def alugar_produto(request, produto_id):
         form = AlugarProdutoForm(request.POST)
         if form.is_valid():
             meses = form.cleaned_data['meses']
+
+            # Salva os dados do aluguel no banco
+            Aluguel.objects.create(
+                usuario=request.user,  # Usuário autenticado
+                notebook=produto,  # Produto sendo alugado
+                meses=meses,  # Quantidade de meses do aluguel
+            )
+
+            # Atualiza o estoque do produto
             produto.estoque -= 1
             produto.disponivel = produto.estoque > 0
             produto.save()
-            return redirect('listar_produtos')
+
+            return redirect('listar_produtos')  # Redireciona após o aluguel
     else:
         form = AlugarProdutoForm()
 
     return render(request, 'produtos/alugar.html', {'produto': produto, 'form': form})
-
 def listar_produtos(request):
     if request.user.is_authenticated and request.user.is_superuser:
         produtos = Produto.objects.all()  # Exibe todos os produtos, incluindo os indisponíveis

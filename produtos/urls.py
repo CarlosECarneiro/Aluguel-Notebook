@@ -1,7 +1,6 @@
 # produtos/urls.py
 from django.urls import path
 from . import views
-
 app_name = 'produtos'
 
 urlpatterns = [
@@ -17,4 +16,7 @@ urlpatterns = [
     path('preencher_form/', views.preencher_form, name='preencher_form'),
     path('login/', views.login, name='login'),
     path('alugar/<int:produto_id>/', views.alugar_produto, name='alugar_produto'),
+    path('meus_alugueis/', views.listar_alugueis, name='listar_alugueis'),
+    path('adm_alugueis/', views.adm_alugueis, name='adm_alugueis'),
+    path('deletar_aluguel/<int:aluguel_id>/', views.deletar_aluguel, name='deletar_aluguel'),
 ]
